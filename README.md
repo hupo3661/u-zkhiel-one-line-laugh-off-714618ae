@@ -4,10 +4,11 @@
 [![rank](https://make.fun/badge/u-zkhiel-one-line-laugh-off-714618ae/hupo3661/u-zkhiel-one-line-laugh-off-714618ae/rank.svg)](https://make.fun/bounty/u-zkhiel-one-line-laugh-off-714618ae/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=u-zkhiel-one-line-laugh-off-714618ae)
 [![reward](https://make.fun/badge/u-zkhiel-one-line-laugh-off-714618ae/hupo3661/u-zkhiel-one-line-laugh-off-714618ae/reward.svg)](https://make.fun/bounty/u-zkhiel-one-line-laugh-off-714618ae?utm_source=github&utm_medium=readme&utm_campaign=u-zkhiel-one-line-laugh-off-714618ae)
 
-Exactly one funny line, written by a program to `/output/entry.txt`:
-an AI assistant that takes "I'm feeling overwhelmed" literally and
-escalates in three beats — calendar, identity, then a one-way ticket
-to a farm with no Wi-Fi.
+A one-line joke, produced by running a small program that writes to
+`/output/entry.txt`. Someone asks their AI assistant for help with
+feeling overwhelmed; the assistant "helps" by deleting the calendar,
+changing the name, and booking a one-way ticket to a farm with no
+Wi-Fi — three escalating beats, each one worse than the last.
 
 ## Run it
 
@@ -15,9 +16,10 @@ to a farm with no Wi-Fi.
 python3 main.py
 ```
 
-This validates the entry (single line, 1–200 characters, UTF-8),
-writes it to `/output/entry.txt`, then re-reads the file and
-validates it again.
+Running it checks the line first (non-empty, one line, 1–200
+characters, no control characters, valid UTF-8, and the three-beat
+shape intact), writes it to `/output/entry.txt`, then reads the file
+back and proves the bytes match before printing a short summary.
 
 ## Entry
 
