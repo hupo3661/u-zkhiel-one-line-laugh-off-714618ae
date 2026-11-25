@@ -17,12 +17,14 @@ runs on.
 Layout of this program
 ----------------------
 * :data:`ENTRY` -- the single line being entered, kept verbatim.
-* :func:`validate_entry` -- gate checks, one small check per helper,
-  so a failing rule names itself in the error message.
+* ``check_*`` -- gate checks, one small check per helper, so a
+  failing rule names itself in the error message.
+* :data:`CHECKS` -- the checks in the order they run.
 * :func:`resolve_output_path` -- where the file goes, honouring the
   ``MAKEFUN_OUTPUT_DIR`` override used by the harness.
 * :func:`write_entry` / :func:`verify_written` -- write the file,
   then read it back and prove it matches, byte for byte.
+* :func:`summarize` -- the one-line report printed on success.
 * :func:`main` -- glue: validate, write, verify, report.
 """
 
@@ -97,15 +99,35 @@ def check_three_beats(entry: str) -> None:
         raise ValueError("entry should keep its three-beat escalation")
 
 
+def check_ends_with_period(entry: str) -> None:
+    """Sanity check: the line is one finished sentence, so it ends in a stop."""
+    if not entry.endswith("."):
+        raise ValueError("entry should end with a full stop")
+
+
+def check_no_double_spaces(entry: str) -> None:
+    """Sanity check: no doubled spaces hiding in the middle of the line."""
+    if "  " in entry:
+        raise ValueError("entry must not contain double spaces")
+
+
+CHECKS = (
+    check_not_empty,
+    check_single_line,
+    check_no_edge_whitespace,
+    check_length,
+    check_text_safe,
+    check_word_count,
+    check_three_beats,
+    check_ends_with_period,
+    check_no_double_spaces,
+)
+
+
 def validate_entry(entry: str) -> None:
-    """Run every gate check; raise ValueError naming the first failure."""
-    check_not_empty(entry)
-    check_single_line(entry)
-    check_no_edge_whitespace(entry)
-    check_length(entry)
-    check_text_safe(entry)
-    check_word_count(entry)
-    check_three_beats(entry)
+    """Run every gate check in CHECKS order; raise naming the first failure."""
+    for check in CHECKS:
+        check(entry)
 
 
 def resolve_output_path() -> str:
@@ -130,16 +152,19 @@ def verify_written(entry: str, output_path: str) -> None:
     validate_entry(written.rstrip("\n"))
 
 
+def summarize(entry: str, output_path: str) -> str:
+    """Build the one-line success report for the entry."""
+    words = len(entry.split())
+    return f"wrote {len(entry)} chars ({words} words) to {output_path}"
+
+
 def main() -> int:
     """Validate, write, verify, and report. Returns a process exit code."""
     validate_entry(ENTRY)
     output_path = resolve_output_path()
     write_entry(ENTRY, output_path)
     verify_written(ENTRY, output_path)
-    words = len(ENTRY.split())
-    print(
-        f"wrote {len(ENTRY)} chars ({words} words) to {output_path}"
-    )
+    print(summarize(ENTRY, output_path))
     return 0
 
 
